@@ -5,9 +5,9 @@ document.getElementById("user_id").textContent = localStorage.getItem("userName"
 function updateMachineDisplay() {
     let selectedMachine = localStorage.getItem("selectedMachine") || "None Selected"; // Get the selected machine from localStorage
     let machineGifs = {
-        "Leg Press": "leg_press.gif",
-        "Bench Press": "bench_press.gif",
-        "Lat Pulldown": "lat_pulldown.gif"
+        "Leg Press": "leg_press.png",
+        "Bench Press": "bench_press.png",
+        "Lat Pulldown": "lat_pulldown.png"
     };
 
     document.getElementById("machine_name").textContent = selectedMachine;  // Update machine name on the page

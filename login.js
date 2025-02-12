@@ -2,9 +2,9 @@ let enteredCode = "";
 const adminCode = "9999";
 let validCodes = {};  // Stores login codes and usernames
 let machineGifs = {
-    "Leg Press": "leg_press.gif",
-    "Bench Press": "bench_press.gif",
-    "Lat Pulldown": "lat_pulldown.gif"
+    "Leg Press": "leg_press.png",
+    "Bench Press": "bench_press.png",
+    "Lat Pulldown": "lat_pulldown.png"
 };
 
 // Function to update machine name and GIF
