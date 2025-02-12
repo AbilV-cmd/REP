@@ -1,16 +1,195 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>replit</title>
-  <link href="style.css" rel="stylesheet" type="text/css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gym Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(to bottom, #2c3e50, #34495e);
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 1200px;
+            gap: 30px;
+            /* Added space between GIF, keypad, and name */
+        }
+
+        /* Left Side (GIF) */
+        #gif_display {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            max-width: 350px;
+            /* Limiting the width */
+            max-height: 700px;
+        }
+
+        #gif_display img {
+            width: 300px;
+            /* Larger GIF */
+            height: 300px;
+            object-fit: contain;
+            border-radius: 10px;
+        }
+
+        /* Center (Keypad) */
+        #login_screen {
+            max-width: 450px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 26px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        /* Code Display */
+        #code_display {
+            font-size: 32px;
+            letter-spacing: 12px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            width: 80%;
+            margin: 20px auto;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        /* Keypad */
+        #keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* Button Styling */
+        .pushable {
+            position: relative;
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .front {
+            width: 100px;
+            height: 100px;
+            font-size: 2rem;
+            font-weight: bold;
+            border-radius: 12px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: translateY(-4px);
+            transition: transform 0.1s;
+        }
+
+        .number .front {
+            background: #dcdcdc;
+            color: #333;
+            box-shadow: 0px 5px 0px #888;
+        }
+
+        .number:active .front {
+            box-shadow: 0px 2px 0px #555;
+        }
+
+        .clear .front {
+            background: hsl(345deg 100% 50%);
+            box-shadow: 0px 5px 0px hsl(345deg 100% 35%);
+        }
+
+        .clear:active .front {
+            box-shadow: 0px 2px 0px hsl(345deg 100% 25%);
+        }
+
+        .pushable:active .front {
+            transform: translateY(0px);
+            box-shadow: 0px 2px 0px #444;
+        }
+
+        /* Right Side (Exercise Name) */
+        #machine_name {
+            font-size: 70px;
+            font-weight: bold;
+            flex: 1;
+            text-align: center;
+            color: white;
+            width: 100%;
+            /* Ensure name takes full width */
+            padding: 10px;
+        }
+    </style>
+    <script src="login.js"></script>
 </head>
 
 <body>
-  Hello world
-  <script src="script.js"></script>
+    <div class="container">
+        <!-- Left: Exercise GIF -->
+        <div id="gif_display">
+            <img id="exercise_gif" src="default.gif" alt="Exercise GIF">
+        </div>
+
+
+        <!-- Center: Keypad -->
+        <div id="login_screen">
+            <h1>Enter Your 4-Digit Code</h1>
+            <div id="code_display">••••</div>
+            <div id="keypad">
+                <button class="pushable number" onclick="enterDigit(1)"><span class="front">1</span></button>
+                <button class="pushable number" onclick="enterDigit(2)"><span class="front">2</span></button>
+                <button class="pushable number" onclick="enterDigit(3)"><span class="front">3</span></button>
+                <button class="pushable number" onclick="enterDigit(4)"><span class="front">4</span></button>
+                <button class="pushable number" onclick="enterDigit(5)"><span class="front">5</span></button>
+                <button class="pushable number" onclick="enterDigit(6)"><span class="front">6</span></button>
+                <button class="pushable number" onclick="enterDigit(7)"><span class="front">7</span></button>
+                <button class="pushable number" onclick="enterDigit(8)"><span class="front">8</span></button>
+                <button class="pushable number" onclick="enterDigit(9)"><span class="front">9</span></button>
+                <button class="pushable clear" onclick="clearCode()"><span class="front">⌫</span></button>
+                <button class="pushable number" onclick="enterDigit(0)"><span class="front">0</span></button>
+                <button class="pushable confirm" onclick="login()"><span class="front">✔</span></button>
+            </div>
+        </div>
+
+        <!-- Right: Exercise Name -->
+        <h2 id="machine_name">Machine: None Selected</h2>
+    </div>
 </body>
 
 </html>
