@@ -6,10 +6,16 @@
     <title>Workout Tracker</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Only adding scroll functionality */
-        #workout_list {
-            max-height: 400px;  /* Adjust this value as needed */
+        /* Ensures the entire page can scroll */
+        body {
             overflow-y: auto;
+        }
+
+        /* Optional: Maintain a consistent layout */
+        #workout_screen {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
         }
     </style>
 </head>
@@ -34,6 +40,4 @@
 
         <button onclick="logout()">Log Out</button>
     </div>
-    <script src="workout.js"></script>
-</body>
-</html>
+    <script src="workout.
