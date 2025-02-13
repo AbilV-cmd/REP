@@ -1,45 +1,28 @@
 function saveWorkout() {
-    let sets = parseInt(document.getElementById("sets").value);
-    let reps = parseInt(document.getElementById("reps").value);
-    let weight = parseFloat(document.getElementById("weight").value);
-    let user = localStorage.getItem("userName") || "Guest";
-    let exercise = localStorage.getItem("machine") || "Unknown Exercise";
-    let oneRepMax = Math.round(weight * (1 + reps / 30));
-
-    if (sets <= 0 || reps <= 0 || weight <= 0 || isNaN(sets) || isNaN(reps) || isNaN(weight)) {
-        alert("Please enter valid workout details.");
-        return;
-    }
-
-    let requestData = {
-        user: user,
-        exercise: exercise,
-        sets: sets,
-        reps: reps,
-        weight: weight,
-        oneRepMax: oneRepMax
+    const workoutData = {
+        user: document.getElementById('user_id').textContent,
+        exercise: document.getElementById('machine_name').textContent,
+        sets: document.getElementById('sets').value,
+        reps: document.getElementById('reps').value,
+        weight: document.getElementById('weight').value,
+        oneRepMax: 1 // Calculate this if needed
     };
 
-    console.log("Sending data to Google Sheets:", requestData);
+    console.log("Sending data to Google Sheets:", workoutData);
 
     fetch("https://script.google.com/macros/s/AKfycbyGd2KJuYyVMspXuc1Ptg4-hvzRZGgefIELZPrvlpKA9yDZt6ppqpW0p0sixNDCoB3RxA/exec", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData)
+        mode: "no-cors",  // Bypass CORS policy
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(workoutData)
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status === "success") {
-            alert("Workout saved successfully!");
-            document.getElementById("sets").value = '';
-            document.getElementById("reps").value = '';
-            document.getElementById("weight").value = '';
-        } else {
-            alert("Failed to save workout.");
-        }
+    .then(() => {
+        alert("Workout saved successfully!");
     })
     .catch(error => {
         console.error("Error saving workout:", error);
-        alert("Failed to save workout. Check console for details.");
+        alert("Failed to save workout. Please try again.");
     });
 }
