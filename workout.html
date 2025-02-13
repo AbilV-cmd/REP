@@ -1,137 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Workout Tracker</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    table, th, td {
-      border: 1px solid black;
-    }
-    th, td {
-      padding: 10px;
-      text-align: left;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Tracker</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Workout Tracker</h1>
+    <div id="workout_screen">
+        <h1>Welcome, <span id="user_id"></span>!</h1>
+        <h2>Logging: <span id="machine_name"></span></h2>
 
-  <form id="workoutForm">
-    <label for="user">User:</label>
-    <input type="text" id="user" required><br><br>
+        <label for="sets">Sets:</label>
+        <input type="number" id="sets" min="1">
 
-    <label for="exercise">Exercise:</label>
-    <input type="text" id="exercise" required><br><br>
+        <label for="reps">Reps:</label>
+        <input type="number" id="reps" min="1">
 
-    <label for="sets">Sets:</label>
-    <input type="number" id="sets" required><br><br>
+        <label for="weight">Weight (lbs):</label>
+        <input type="number" id="weight" min="1">
 
-    <label for="reps">Reps:</label>
-    <input type="number" id="reps" required><br><br>
+        <button onclick="saveWorkout()">Save Workout</button>
 
-    <label for="weight">Weight (lbs):</label>
-    <input type="number" id="weight" required><br><br>
+        <h2>Workout Log</h2>
+        <ul id="workout_list"></ul>
 
-    <label for="oneRepMax">1-Rep Max (optional):</label>
-    <input type="number" id="oneRepMax"><br><br>
-
-    <button type="submit">Save Workout</button>
-  </form>
-
-  <h2>Workout History</h2>
-  <table id="workoutTable">
-    <thead>
-      <tr>
-        <th>Timestamp</th>
-        <th>User</th>
-        <th>Exercise</th>
-        <th>Sets</th>
-        <th>Reps</th>
-        <th>Weight</th>
-        <th>1-Rep Max</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Data will be populated here -->
-    </tbody>
-  </table>
-
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
-
-  <script>
-    // Firebase Configuration
-    const firebaseConfig = {
-  apiKey: "AIzaSyAkD12rVXIcmqsYjrdlLQd1bfGdW1U2diI",
-  authDomain: "input-user-data.firebaseapp.com",
-  projectId: "input-user-data",
-  storageBucket: "input-user-data.firebasestorage.app",
-  messagingSenderId: "24332274756",
-  appId: "1:24332274756:web:334a452f8ab90402a00011",
-  measurementId: "G-6NYTQ3K185"
-};
-
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore(app);
-
-    // Save Workout Data
-    document.getElementById("workoutForm").addEventListener("submit", function(event) {
-      event.preventDefault();
-
-      const formData = {
-        timestamp: new Date().toLocaleString(),
-        user: document.getElementById("user").value,
-        exercise: document.getElementById("exercise").value,
-        sets: document.getElementById("sets").value,
-        reps: document.getElementById("reps").value,
-        weight: document.getElementById("weight").value,
-        oneRepMax: document.getElementById("oneRepMax").value || "N/A"
-      };
-
-      db.collection("workouts").add(formData).then(function() {
-        console.log("Workout saved!");
-        loadWorkouts();
-        document.getElementById("workoutForm").reset();
-      }).catch(function(error) {
-        console.error("Error saving workout: ", error);
-      });
-    });
-
-    // Load Workout Data
-    function loadWorkouts() {
-      db.collection("workouts").orderBy("timestamp", "desc").get().then(function(querySnapshot) {
-        const tableBody = document.querySelector("#workoutTable tbody");
-        tableBody.innerHTML = "";
-
-        querySnapshot.forEach(function(doc) {
-          const data = doc.data();
-          const row = document.createElement("tr");
-          
-          for (let key in data) {
-            const cell = document.createElement("td");
-            cell.textContent = data[key];
-            row.appendChild(cell);
-          }
-
-          tableBody.appendChild(row);
-        });
-      });
-    }
-
-    // Load workouts on page load
-    loadWorkouts();
-  </script>
+        <button onclick="logout()">Log Out</button>
+    </div>
+    <script src="workout.js"></script>
 </body>
 </html>
