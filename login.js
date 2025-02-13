@@ -1,49 +1,38 @@
 let enteredCode = "";
+const validCodes = { "1234": "Abil", "5678": "Ben" };
 const adminCode = "9999";
-let validCodes = {};  // Stores login codes and usernames
+
+// Machine GIFs and their corresponding names
 let machineGifs = {
     "Leg Press": "leg_press.png",
     "Bench Press": "bench_press.png",
     "Lat Pulldown": "lat_pulldown.png"
 };
 
-// Function to update machine name and GIF
+// Function to update machine name and GIF dynamically
 function updateMachineDisplay() {
     let selectedMachine = localStorage.getItem("selectedMachine") || "None Selected";
 
-    document.getElementById("machine_name").innerHTML = selectedMachine.replace(" ", "<br>"); // Break name into two lines
+    // Set the machine name in the exercise name display
+    document.getElementById("machine_name").innerHTML = selectedMachine.replace(" ", "<br>");
 
+    // Get the correct GIF for the selected machine
+    let gifSrc = machineGifs[selectedMachine] || "default.gif";
+
+    // Get the GIF element and update the source
     let gifElement = document.getElementById("exercise_gif");
-    let newSrc = machineGifs[selectedMachine] || "default.gif";
+    gifElement.src = gifSrc;
 
-    // Force reload GIF
-    gifElement.src = newSrc + "?t=" + new Date().getTime();
+    // To ensure the GIF restarts, you can briefly set the `src` to a blank image and then back to the GIF
+    gifElement.src = "";
+    gifElement.src = gifSrc;
 }
 
-// Fetch users from Google Sheets
-function fetchUsers() {
-    fetch("https://script.google.com/macros/s/AKfycbxvRWjBiFloA8yelDhfLuOCk6SKQ6_FttfgtnrITTlmn9wyjImbvk5B_Il3KCMLKevaKg/exec", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "getUsers" }) // Request user data
-    })
-    .then(response => response.json())
-    .then(data => {
-        validCodes = data;
-        console.log("User Data Loaded:", validCodes);
-    })
-    .catch(error => {
-        console.error("Error fetching users:", error);
-        alert("⚠️ Error fetching users. Make sure Google Sheets script is published correctly.");
-    });
-}
+// Run the update function when the page is loaded and whenever the machine is selected
+document.addEventListener("DOMContentLoaded", updateMachineDisplay);
+setInterval(updateMachineDisplay, 1000); // This will check every second for updates
 
-document.addEventListener("DOMContentLoaded", function () {
-    fetchUsers();
-    updateMachineDisplay();
-});
-
-// Function to enter digits
+// Function to handle keypad input
 function enterDigit(digit) {
     if (enteredCode.length < 4) {
         enteredCode += digit;
@@ -51,39 +40,27 @@ function enterDigit(digit) {
     }
 }
 
-// Function to update the code display
-function updateCodeDisplay() {
-    document.getElementById("code_display").textContent = enteredCode.padEnd(4, "•");
-}
-
-// Function to clear the entered code
+// Function to clear entered code
 function clearCode() {
     enteredCode = "";
     updateCodeDisplay();
 }
 
-// Login function (integrated with Google Sheets)
+// Function to update the display of the entered code
+function updateCodeDisplay() {
+    document.getElementById("code_display").textContent = enteredCode.padEnd(4, "•");
+}
+
+// Function to handle login
 function login() {
     if (enteredCode === adminCode) {
-        window.location.href = "admin.html";  // Redirect to admin page
+        window.location.href = "admin.html"; // Redirect to admin page
     } else if (validCodes[enteredCode]) {
         localStorage.setItem("userCode", enteredCode);
-        localStorage.setItem("userName", validCodes[enteredCode]); // Store username
+        localStorage.setItem("userName", validCodes[enteredCode]);
         window.location.href = "workout.html"; // Redirect to workout page
     } else {
-        alert("Invalid Code! Please try again.");
+        alert("Invalid Code!");
         clearCode();
     }
 }
-
-// Function to handle key presses (optional for keyboard support)
-document.addEventListener("keydown", function(event) {
-    if (event.key >= "0" && event.key <= "9") {
-        enterDigit(event.key);
-    } else if (event.key === "Backspace") {
-        enteredCode = enteredCode.slice(0, -1);
-        updateCodeDisplay();
-    } else if (event.key === "Enter") {
-        login();
-    }
-});

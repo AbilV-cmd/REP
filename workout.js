@@ -1,23 +1,23 @@
 // Display the user's name and the selected machine name
 document.getElementById("user_id").textContent = localStorage.getItem("userName");
 
-// Function to update the machine's name and GIF dynamically when the page loads
+// Function to update the machine's name and image dynamically when the page loads
 function updateMachineDisplay() {
     let selectedMachine = localStorage.getItem("selectedMachine") || "None Selected"; // Get the selected machine from localStorage
-    let machineGifs = {
+    let machineImages = {
         "Leg Press": "leg_press.png",
         "Bench Press": "bench_press.png",
         "Lat Pulldown": "lat_pulldown.png"
     };
 
-    document.getElementById("machine_name").textContent = selectedMachine;  // Update machine name on the page
-    document.getElementById("exercise_gif").src = machineGifs[selectedMachine] || "default.gif";  // Update the GIF based on selected machine
+    document.getElementById("machine_name").innerHTML = selectedMachine.replace(" ", "<br>");  // Break name into two lines
+    document.getElementById("exercise_gif").src = machineImages[selectedMachine] || "default.png";  // Update the image based on selected machine
 }
 
 // Run update on page load
 document.addEventListener("DOMContentLoaded", updateMachineDisplay);
 
-// Function to save the workout details to the server
+// Function to save the workout details to Google Sheets
 function saveWorkout() {
     let sets = parseInt(document.getElementById("sets").value);
     let reps = parseInt(document.getElementById("reps").value);
@@ -33,16 +33,36 @@ function saveWorkout() {
 
     let oneRepMax = Math.round(weight * (1 + reps / 30));
 
-    fetch("workout.php", {
+    // Send data to Google Sheets
+    fetch("https://script.google.com/macros/s/AKfycbx6eBRLdZ9blpRV_qr9icTLrI0GxgOyFawuTzTfxcnq2QMt_w4wV59i5UDwQsNtCdG_/exec", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify({ user, exercise, sets, reps, weight, oneRepMax, date })
+        body: JSON.stringify({ 
+            action: "saveWorkout", 
+            user, 
+            exercise, 
+            sets, 
+            reps, 
+            weight, 
+            oneRepMax, 
+            date 
+        })
     })
     .then(response => response.text())
-    .then(data => console.log("Server Response:", data))
-    .catch(error => console.error("Error:", error));
+    .then(data => {
+        console.log("Server Response:", data);
+        if (data.includes("Success")) {
+            alert("✅ Workout saved successfully!");
+        } else {
+            alert("⚠️ Error saving workout. Please try again.");
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("⚠️ Error connecting to server.");
+    });
 
     // Create a new workout log item
     let logItem = document.createElement("li");
