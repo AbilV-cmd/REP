@@ -23,7 +23,7 @@ function saveWorkout() {
     let reps = parseInt(document.getElementById("reps").value);
     let weight = parseFloat(document.getElementById("weight").value);
     let user = localStorage.getItem("userName");
-    let exercise = localStorage.getItem("selectedMachine");
+    let exercise = localStorage.getItem("selectedMachine");  // Use the selected machine from localStorage
     let date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
     if (sets <= 0 || reps <= 0 || weight <= 0) {
@@ -34,12 +34,13 @@ function saveWorkout() {
     let oneRepMax = Math.round(weight * (1 + reps / 30));
 
     // Send data to Google Sheets
-    fetch(process.env.REACT_APP_GOOGLE_SHEETS_URL, {
+    fetch("https://script.google.com/macros/s/AKfycbygOM1AUYptMN4uuDTZFviECny_64gpSfm3Cccmy04Cy8YdiKMYiPo0aie0hhQQ1xtUEg/exec", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify({ 
+            action: "saveWorkout", 
             user, 
             exercise, 
             sets, 
@@ -49,10 +50,10 @@ function saveWorkout() {
             date 
         })
     })
-    .then(response => response.json())
+    .then(response => response.text())
     .then(data => {
         console.log("Server Response:", data);
-        if (data.status === "Success") {
+        if (data.includes("Success")) {
             alert("✅ Workout saved successfully!");
         } else {
             alert("⚠️ Error saving workout. Please try again.");
