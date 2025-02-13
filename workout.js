@@ -36,7 +36,7 @@ fetch(endpoint, {
     }
 })
 .catch(error => {
-    console.error("Error saving workout:", error);
+    console.error("Direct request failed:", error);
     console.warn("Trying with CORS proxy...");
 
     // Retry with CORS proxy
