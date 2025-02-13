@@ -107,13 +107,14 @@ button {
 button:hover {
     background: #0056b3;
 }
-
-/* Workout Log */
 #workout_list {
-    list-style: none;
-    padding: 0;
-    margin-top: 20px;
-}
+            list-style: none;
+            padding: 0;
+            max-height: 300px;  /* Fixed height for scrolling */
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
 
 #workout_list li {
     background: #f8f9fa;
