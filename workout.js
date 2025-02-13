@@ -12,7 +12,7 @@ function saveWorkout() {
     let reps = parseInt(document.getElementById("reps").value);
     let weight = parseFloat(document.getElementById("weight").value);
     let user = localStorage.getItem("userName");
-    let exercise = localStorage.getItem("selectedMachine");  // Use the selected machine from localStorage
+    let exercise = localStorage.getItem("selectedMachine"); 
     let date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
     if (sets <= 0 || reps <= 0 || weight <= 0) {
@@ -21,26 +21,23 @@ function saveWorkout() {
     }
 
     let oneRepMax = Math.round(weight * (1 + reps / 30));
+    let totalVolume = sets * reps * weight;
+    let averageIntensity = Math.round((weight / oneRepMax) * 100);
+    let estimatedDuration = sets * 2; // Assuming 2 minutes per set
+    let workoutDensity = Math.round(totalVolume / estimatedDuration);
+    let estimatedCalories = Math.round(6 * (weight / 2.2) * (estimatedDuration / 60)); // MET value of 6 for strength training
 
-    // Sending data to server (Placeholder - adjust URL and backend as needed)
-    fetch("workout.php", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ user, exercise, sets, reps, weight, oneRepMax, date })
-    })
-    .then(response => response.text())
-    .then(data => console.log("Server Response:", data))
-    .catch(error => console.error("Error:", error));
-
-    // Create a new workout log item
+    // Display Workout Log
     let logItem = document.createElement("li");
-    logItem.innerHTML = `<strong>${exercise}</strong> - ${sets}x${reps} @ ${weight} lbs 
-        <br> 1-Rep Max: <strong>${oneRepMax} lbs</strong> 
+    logItem.innerHTML = `
+        <strong>${exercise}</strong> - ${sets}x${reps} @ ${weight} lbs 
+        <br> 1-Rep Max: <strong>${oneRepMax} lbs</strong>
+        <br> Total Volume: <strong>${totalVolume} lbs</strong>
+        <br> Avg. Intensity: <strong>${averageIntensity}%</strong>
+        <br> Workout Density: <strong>${workoutDensity} lbs/min</strong>
+        <br> Estimated Calories: <strong>${estimatedCalories} kcal</strong>
         <br> <em>${date}</em>`;
 
-    // Prepend the log item to the workout list
     document.getElementById("workout_list").prepend(logItem);
 
     // Clear input fields
@@ -52,5 +49,6 @@ function saveWorkout() {
 // Logout Function
 function logout() {
     localStorage.removeItem("userName");
+    localStorage.removeItem("selectedMachine");
     window.location.href = "index.html";  // Redirect to login page
 }
