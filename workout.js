@@ -1,5 +1,5 @@
+const proxyUrl = "https://my-cors-proxy.herokuapp.com/";
 const endpoint = "https://script.google.com/macros/s/AKfycbyGd2KJuYyVMspXuc1Ptg4-hvzRZGgefIELZPrvlpKA9yDZt6ppqpW0p0sixNDCoB3RxA/exec";
-const proxyUrl = "https://corsproxy.io/?";
 
 const workoutData = {
     user: "JohnDoe",
@@ -12,7 +12,7 @@ const workoutData = {
 
 console.log("Sending data to Google Sheets:", workoutData);
 
-fetch(endpoint, {
+fetch(proxyUrl + endpoint, {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
@@ -36,34 +36,6 @@ fetch(endpoint, {
     }
 })
 .catch(error => {
-    console.error("Direct request failed:", error);
-    console.warn("Trying with CORS proxy...");
-
-    // Retry with CORS proxy
-    fetch(proxyUrl + endpoint, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(workoutData)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Network response was not ok (via CORS proxy)");
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.status === "success") {
-            console.log("Success via CORS proxy:", data);
-            alert("Workout saved successfully (via proxy)!");
-        } else {
-            console.error("Error response from server (via proxy):", data);
-            alert("Failed to save workout: " + data.message);
-        }
-    })
-    .catch(proxyError => {
-        console.error("CORS proxy also failed:", proxyError);
-        alert("Failed to save workout. Please try again later.");
-    });
+    console.error("Request failed:", error);
+    alert("Failed to save workout. Please try again later.");
 });
