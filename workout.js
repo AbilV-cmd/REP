@@ -1,41 +1,35 @@
-const proxyUrl = "https://my-cors-proxy.herokuapp.com/";
-const endpoint = "https://script.google.com/macros/s/AKfycbyGd2KJuYyVMspXuc1Ptg4-hvzRZGgefIELZPrvlpKA9yDZt6ppqpW0p0sixNDCoB3RxA/exec";
+function saveWorkout() {
+    let sets = parseInt(document.getElementById("sets").value);
+    let reps = parseInt(document.getElementById("reps").value);
+    let weight = parseFloat(document.getElementById("weight").value);
+    let user = localStorage.getItem("userName");
+    let exercise = localStorage.getItem("selectedMachine");  // Use the selected machine from localStorage
+    let date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 
-const workoutData = {
-    user: "JohnDoe",
-    exercise: "Bench Press",
-    sets: 4,
-    reps: 12,
-    weight: 200,
-    oneRepMax: 240
-};
-
-console.log("Sending data to Google Sheets:", workoutData);
-
-fetch(proxyUrl + endpoint, {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify(workoutData)
-})
-.then(response => {
-    if (!response.ok) {
-        console.error("Response not OK:", response);
-        throw new Error("Network response was not ok");
+    if (sets <= 0 || reps <= 0 || weight <= 0) {
+        alert("Please enter valid workout details.");
+        return;
     }
-    return response.json();
-})
-.then(data => {
-    if (data.status === "success") {
-        console.log("Success:", data);
-        alert("Workout saved successfully!");
-    } else {
-        console.error("Error response from server:", data);
-        alert("Failed to save workout: " + data.message);
-    }
-})
-.catch(error => {
-    console.error("Request failed:", error);
-    alert("Failed to save workout. Please try again later.");
-});
+
+    let oneRepMax = Math.round(weight * (1 + reps / 30));
+
+    fetch("workout.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ user, exercise, sets, reps, weight, oneRepMax, date })
+    })
+    .then(response => response.text())
+    .then(data => console.log("Server Response:", data))
+    .catch(error => console.error("Error:", error));
+
+    // Create a new workout log item
+    let logItem = document.createElement("li");
+    logItem.innerHTML = `<strong>${exercise}</strong> - ${sets}x${reps} @ ${weight} lbs 
+        <br> 1-Rep Max: <strong>${oneRepMax} lbs</strong> 
+        <br> <em>${date}</em>`;
+
+    // Prepend the log item to the workout list
+    document.getElementById("workout_list").prepend(logItem);
+}
