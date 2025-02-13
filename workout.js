@@ -10,7 +10,7 @@ function saveWorkout() {
 
     console.log("Sending data to Google Sheets:", workoutData);
 
-    fetch("https://script.google.com/macros/s/19TvG2IrQtQ5BeOZtYvRSiKPtlDA-c1cWhYHHuDFiUuc/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbyGd2KJuYyVMspXuc1Ptg4-hvzRZGgefIELZPrvlpKA9yDZt6ppqpW0p0sixNDCoB3RxA/exec", {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
