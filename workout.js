@@ -1,3 +1,12 @@
+// Display the username and selected exercise
+window.onload = function() {
+    let userName = localStorage.getItem("userName");
+    let selectedMachine = localStorage.getItem("selectedMachine");
+    document.getElementById("user_id").textContent = userName || "Guest";
+    document.getElementById("machine_name").textContent = selectedMachine || "No Machine Selected";
+};
+
+// Save Workout Function
 function saveWorkout() {
     let sets = parseInt(document.getElementById("sets").value);
     let reps = parseInt(document.getElementById("reps").value);
@@ -13,6 +22,7 @@ function saveWorkout() {
 
     let oneRepMax = Math.round(weight * (1 + reps / 30));
 
+    // Sending data to server (Placeholder - adjust URL and backend as needed)
     fetch("workout.php", {
         method: "POST",
         headers: {
@@ -32,4 +42,16 @@ function saveWorkout() {
 
     // Prepend the log item to the workout list
     document.getElementById("workout_list").prepend(logItem);
+
+    // Clear input fields
+    document.getElementById("sets").value = "";
+    document.getElementById("reps").value = "";
+    document.getElementById("weight").value = "";
+}
+
+// Logout Function
+function logout() {
+    localStorage.removeItem("userName");
+    localStorage.removeItem("selectedMachine");
+    window.location.href = "login.html";  // Redirect to login page
 }
