@@ -1,21 +1,5 @@
-// Display the user's name and the selected machine name
 document.getElementById("user_id").textContent = localStorage.getItem("userName");
-
-// Function to update the machine's name and image dynamically when the page loads
-function updateMachineDisplay() {
-    let selectedMachine = localStorage.getItem("selectedMachine") || "None Selected"; 
-    let machineImages = {
-        "Leg Press": "leg_press.png",
-        "Bench Press": "bench_press.png",
-        "Lat Pulldown": "lat_pulldown.png"
-    };
-
-    document.getElementById("machine_name").innerHTML = selectedMachine.replace(" ", "<br>");
-    document.getElementById("exercise_gif").src = machineImages[selectedMachine] || "default.png";
-}
-
-// Run update on page load
-document.addEventListener("DOMContentLoaded", updateMachineDisplay);
+document.getElementById("machine_name").innerHTML = (localStorage.getItem("selectedMachine") || "None Selected").replace(" ", "<br>");
 
 // Function to save the workout details to Google Sheets
 function saveWorkout() {
@@ -23,58 +7,60 @@ function saveWorkout() {
     let reps = parseInt(document.getElementById("reps").value);
     let weight = parseFloat(document.getElementById("weight").value);
     let user = localStorage.getItem("userName");
-    let exercise = localStorage.getItem("selectedMachine");  // Use the selected machine from localStorage
-    let date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    let exercise = localStorage.getItem("selectedMachine");
+    let oneRepMax = Math.round(weight * (1 + reps / 30));
 
-    if (sets <= 0 || reps <= 0 || weight <= 0) {
+    // Validate inputs
+    if (sets <= 0 || reps <= 0 || weight <= 0 || isNaN(sets) || isNaN(reps) || isNaN(weight)) {
         alert("Please enter valid workout details.");
         return;
     }
 
-    let oneRepMax = Math.round(weight * (1 + reps / 30));
+    if (!user || !exercise) {
+        alert("No user or exercise selected!");
+        return;
+    }
 
-    // Send data to Google Sheets
-    fetch("https://script.google.com/macros/s/AKfycbygOM1AUYptMN4uuDTZFviECny_64gpSfm3Cccmy04Cy8YdiKMYiPo0aie0hhQQ1xtUEg/exec", {
+    let requestData = {
+        user: user,
+        exercise: exercise,
+        sets: sets,
+        reps: reps,
+        weight: weight,
+        oneRepMax: oneRepMax,
+        timestamp: new Date().toISOString()
+    };
+
+    console.log("Sending data to Google Sheets:", requestData);
+
+    // Send data to Google Sheets (Your Google Apps Script URL)
+    fetch("https://script.google.com/macros/s/AKfycbyGd2KJuYyVMspXuc1Ptg4-hvzRZGgefIELZPrvlpKA9yDZt6ppqpW0p0sixNDCoB3RxA/exec", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ 
-            action: "saveWorkout", 
-            user, 
-            exercise, 
-            sets, 
-            reps, 
-            weight, 
-            oneRepMax, 
-            date 
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData)
     })
-    .then(response => response.text())
-    .then(data => {
-        console.log("Server Response:", data);
-        if (data.includes("Success")) {
+    .then(response => {
+        console.log("Google Sheets Response:", response);
+        if (response.ok) {
             alert("✅ Workout saved successfully!");
         } else {
             alert("⚠️ Error saving workout. Please try again.");
         }
     })
     .catch(error => {
-        console.error("Error:", error);
+        console.error("Error saving workout:", error);
         alert("⚠️ Error connecting to server.");
     });
 
-    // Create a new workout log item
+    // Create a new workout log item for the UI
+    let date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
     let logItem = document.createElement("li");
     logItem.innerHTML = `<strong>${exercise}</strong> - ${sets}x${reps} @ ${weight} lbs 
         <br> 1-Rep Max: <strong>${oneRepMax} lbs</strong> 
         <br> <em>${date}</em>`;
-
-    // Prepend the log item to the workout list
     document.getElementById("workout_list").prepend(logItem);
 }
 
-// Function to log out the user and redirect to the login page
 function logout() {
     localStorage.removeItem("userCode");
     localStorage.removeItem("userName");
