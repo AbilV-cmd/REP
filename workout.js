@@ -53,5 +53,5 @@ function saveWorkout() {
 function logout() {
     localStorage.removeItem("userName");
     localStorage.removeItem("selectedMachine");
-    window.location.href = "login.html";  // Redirect to login page
+    window.location.href = "index.html";  // Redirect to login page
 }
