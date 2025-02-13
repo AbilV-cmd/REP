@@ -1,22 +1,3 @@
-// Display the user's name and the selected machine name
-document.getElementById("user_id").textContent = localStorage.getItem("userName");
-
-// Function to update the machine's name and image dynamically when the page loads
-function updateMachineDisplay() {
-    let selectedMachine = localStorage.getItem("selectedMachine") || "None Selected"; // Get the selected machine from localStorage
-    let machineImages = {
-        "Leg Press": "leg_press.png",
-        "Bench Press": "bench_press.png",
-        "Lat Pulldown": "lat_pulldown.png"
-    };
-
-    document.getElementById("machine_name").innerHTML = selectedMachine.replace(" ", "<br>");  // Break name into two lines
-    document.getElementById("exercise_gif").src = machineImages[selectedMachine] || "default.png";  // Update the image based on selected machine
-}
-
-// Run update on page load
-document.addEventListener("DOMContentLoaded", updateMachineDisplay);
-
 // Function to save the workout details to Google Sheets
 function saveWorkout() {
     let sets = parseInt(document.getElementById("sets").value);
@@ -34,7 +15,7 @@ function saveWorkout() {
     let oneRepMax = Math.round(weight * (1 + reps / 30));
 
     // Send data to Google Sheets
-    fetch("https://script.google.com/macros/s/AKfycbx6eBRLdZ9blpRV_qr9icTLrI0GxgOyFawuTzTfxcnq2QMt_w4wV59i5UDwQsNtCdG_/exec", {
+    fetch("https://script.google.com/macros/s/AKfycbz4PTe7YHSHHn63qqyhJf2Z2mOD48bGK_ZN2RRPH5GeRk-a9nW5qj1dmPekQWr9TelO/exec", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -72,11 +53,4 @@ function saveWorkout() {
 
     // Prepend the log item to the workout list
     document.getElementById("workout_list").prepend(logItem);
-}
-
-// Function to log out the user and redirect to the login page
-function logout() {
-    localStorage.removeItem("userCode");
-    localStorage.removeItem("userName");
-    window.location.href = "index.html";
 }
