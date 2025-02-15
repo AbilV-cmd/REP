@@ -1,46 +1,45 @@
-// Display the username and selected exercise
-window.onload = function() {
-    let userName = localStorage.getItem("userName");
-    let selectedMachine = localStorage.getItem("selectedMachine");
-    document.getElementById("user_id").textContent = userName || "Guest";
-    document.getElementById("machine_name").textContent = selectedMachine || "No Machine Selected";
-};
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Ensures the entire page can scroll */
+        body {
+            overflow-y: auto;
+        }
 
-// Save Workout Function
-function saveWorkout() {
-    let sets = parseInt(document.getElementById("sets").value);
-    let reps = parseInt(document.getElementById("reps").value);
-    let weight = parseFloat(document.getElementById("weight").value);
-    let user = localStorage.getItem("userName");
-    let exercise = localStorage.getItem("selectedMachine");
-    let date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+        /* Optional: Maintain a consistent layout */
+        #workout_screen {
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div id="workout_screen">
+        <h1>Welcome, <span id="user_id"></span>!</h1>
+        <h2>Logging: <span id="machine_name"></span></h2>
 
-    if (sets <= 0 || reps <= 0 || weight <= 0) {
-        alert("Please enter valid workout details.");
-        return;
-    }
+        <label for="sets">Sets:</label>
+        <input type="number" id="sets" min="1">
 
-    let oneRepMax = Math.round(weight * (1 + reps / 30));
+        <label for="reps">Reps:</label>
+        <input type="number" id="reps" min="1">
 
-    // Create a new workout log item
-    let logItem = document.createElement("li");
-    logItem.innerHTML = `<strong>${exercise}</strong> - ${sets}x${reps} @ ${weight} lbs 
-        <br> 1-Rep Max: <strong>${oneRepMax} lbs</strong> 
-        <br> <em>${date}</em>`;
+        <label for="weight">Weight (lbs):</label>
+        <input type="number" id="weight" min="1">
 
-    // Prepend the log item to the workout list
-    document.getElementById("workout_list").prepend(logItem);
+        <button onclick="saveWorkout()">Save Workout</button>
 
-    // Clear input fields
-    document.getElementById("sets").value = "";
-    document.getElementById("reps").value = "";
-    document.getElementById("weight").value = "";
+        <h2>Workout Log</h2>
+        <ul id="workout_list"></ul>
 
-    alert("Workout saved successfully!");
-}
-
-// Logout Function
-function logout() {
-    localStorage.removeItem("userName");
-    window.location.href = "index.html";  // Redirect to login page
-}
+        <button onclick="logout()">Log Out</button>
+    </div>
+    <script src="workout.js"></script>
+</body>
+</html>
