@@ -1,5 +1,5 @@
 let enteredCode = "";
-const validCodes = { "1234": "Abil", "5678": "Ben" };
+const validCodes = { "1234": "Abil", "5678": "Maxwell" };
 const adminCode = "9999";
 
 // Machine GIFs and their corresponding names
