@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trainer Dashboard</title>
+<style>
+  body { font-family: Arial, sans-serif; background:#2c3e50; color:white; margin:0; padding:20px;}
+  table { width:100%; border-collapse: collapse; margin-top:20px; background: rgba(0,0,0,0.4);}
+  th, td { padding:8px; text-align:center; border:1px solid white;}
+  th { background:#4CAF50; }
+  select,input { margin:5px; padding:5px;}
+</style>
+</head>
+<body>
+<h1>Trainer Dashboard</h1>
+
+<label for="userFilter">User:</label>
+<select id="userFilter"><option value="">All</option></select>
+
+<label for="machineFilter">Machine:</label>
+<select id="machineFilter"><option value="">All</option></select>
+
+<button onclick="applyFilters()">Apply Filters</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th><th>User</th><th>Machine</th><th>Sets</th><th>Reps</th><th>Weight</th><th>1RM</th>
+    </tr>
+  </thead>
+  <tbody id="logBody"></tbody>
+</table>
+
+<script>
+// Google Sheets Web App URL
+const SHEET_URL = "<YOUR_WEB_APP_URL>"; // Same as workout page
+let logData = [];
+
+// Fetch all workouts
+function fetchWorkouts(){
+  fetch(SHEET_URL) // Should be a GET endpoint returning JSON (we can adjust Apps Script)
+    .then(res=>res.json())
+    .then(data=>{
+      logData = data; 
+      populateFilters();
+      renderTable(logData);
+    })
+    .catch(err=>console.error(err));
+}
+
+// Populate filter dropdowns
+function populateFilters(){
+  const users = [...new Set(logData.map(e=>e.user))];
+  const machines = [...new Set(logData.map(e=>e.machine))];
+  const userFilter = document.getElementById("userFilter");
+  const machineFilter = document.getElementById("machineFilter");
+  users.forEach(u=>{
+    const opt = document.createElement("option"); opt.value=u; opt.textContent=u; userFilter.appendChild(opt);
+  });
+  machines.forEach(m=>{
+    const opt = document.createElement("option"); opt.value=m; opt.textContent=m; machineFilter.appendChild(opt);
+  });
+}
+
+// Apply selected filters
+function applyFilters(){
+  const uVal = document.getElementById("userFilter").value;
+  const mVal = document.getElementById("machineFilter").value;
+  const filtered = logData.filter(item=> (uVal===""||item.user===uVal) && (mVal===""||item.machine===mVal));
+  renderTable(filtered);
+}
+
+// Render table
+function renderTable(data){
+  const tbody = document.getElementById("logBody");
+  tbody.innerHTML="";
+  data.forEach(d=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`<td>${d.date}</td><td>${d.user}</td><td>${d.machine}</td>
+      <td>${d.sets}</td><td>${d.reps}</td><td>${d.weight}</td><td>${d.oneRepMax}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+// Load on page open
+fetchWorkouts();
+</script>
+</body>
+</html>
