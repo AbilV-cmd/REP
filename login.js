@@ -2,65 +2,63 @@ let enteredCode = "";
 const validCodes = { "1234": "Abil", "5678": "Maxwell" };
 const adminCode = "9999";
 
-// Machine GIFs and their corresponding names
-let machineGifs = {
-    "Leg Press": "leg_press.png",
-    "Bench Press": "bench_press.png",
-    "Lat Pulldown": "lat_pulldown.png"
-};
+const machineGifs = { "Leg Press":"leg_press.png", "Bench Press":"bench_press.png", "Lat Pulldown":"lat_pulldown.png" };
+const keypadContainer = document.getElementById("keypad");
+const codeDisplay = document.getElementById("code_display");
+const feedback = document.getElementById("login_feedback");
+const exerciseGif = document.getElementById("exercise_gif");
+const machineNameDisplay = document.getElementById("machine_name");
 
-// Function to update machine name and GIF dynamically
+// Generate keypad dynamically
+[1,2,3,4,5,6,7,8,9,'⌫',0,'✔'].forEach(val => {
+    const btn = document.createElement("button");
+    btn.className = "pushable";
+    if(val === '⌫') btn.classList.add("clear");
+    else if(val === '✔') btn.classList.add("confirm");
+    else btn.classList.add("number");
+
+    const front = document.createElement("span");
+    front.className = "front";
+    front.textContent = val;
+    btn.appendChild(front);
+
+    btn.onclick = () => {
+        if(val === '⌫') clearCode();
+        else if(val === '✔') login();
+        else enterDigit(val);
+    };
+    keypadContainer.appendChild(btn);
+});
+
+// Update machine display and GIF
 function updateMachineDisplay() {
-    let selectedMachine = localStorage.getItem("selectedMachine") || "None Selected";
-
-    // Set the machine name in the exercise name display
-    document.getElementById("machine_name").innerHTML = selectedMachine.replace(" ", "<br>");
-
-    // Get the correct GIF for the selected machine
-    let gifSrc = machineGifs[selectedMachine] || "default.gif";
-
-    // Get the GIF element and update the source
-    let gifElement = document.getElementById("exercise_gif");
-    gifElement.src = gifSrc;
-
-    // To ensure the GIF restarts, you can briefly set the `src` to a blank image and then back to the GIF
-    gifElement.src = "";
-    gifElement.src = gifSrc;
+    const selectedMachine = localStorage.getItem("selectedMachine") || "None Selected";
+    machineNameDisplay.innerHTML = selectedMachine.replace(" ", "<br>");
+    exerciseGif.src = machineGifs[selectedMachine] || "default.gif";
 }
 
-// Run the update function when the page is loaded and whenever the machine is selected
+// Call once on page load
 document.addEventListener("DOMContentLoaded", updateMachineDisplay);
-setInterval(updateMachineDisplay, 1000); // This will check every second for updates
 
-// Function to handle keypad input
 function enterDigit(digit) {
-    if (enteredCode.length < 4) {
-        enteredCode += digit;
-        updateCodeDisplay();
-    }
+    if(enteredCode.length<4){ enteredCode+=digit; updateCodeDisplay(); }
 }
 
-// Function to clear entered code
-function clearCode() {
-    enteredCode = "";
-    updateCodeDisplay();
+function clearCode(){ enteredCode=""; updateCodeDisplay(); }
+
+function updateCodeDisplay(){
+    codeDisplay.textContent = enteredCode.padEnd(4,'•');
 }
 
-// Function to update the display of the entered code
-function updateCodeDisplay() {
-    document.getElementById("code_display").textContent = enteredCode.padEnd(4, "•");
-}
-
-// Function to handle login
+// Login logic with inline feedback
 function login() {
-    if (enteredCode === adminCode) {
-        window.location.href = "admin.html"; // Redirect to admin page
-    } else if (validCodes[enteredCode]) {
+    if(enteredCode===adminCode){ window.location.href="admin.html"; return; }
+    if(validCodes[enteredCode]){
         localStorage.setItem("userCode", enteredCode);
         localStorage.setItem("userName", validCodes[enteredCode]);
-        window.location.href = "workout.html"; // Redirect to workout page
+        window.location.href="workout.html";
     } else {
-        alert("Invalid Code!");
+        feedback.textContent="Invalid Code!";
         clearCode();
     }
 }
