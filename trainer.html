@@ -4,87 +4,216 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trainer Dashboard</title>
+
 <style>
-  body { font-family: Arial, sans-serif; background:#2c3e50; color:white; margin:0; padding:20px;}
-  table { width:100%; border-collapse: collapse; margin-top:20px; background: rgba(0,0,0,0.4);}
-  th, td { padding:8px; text-align:center; border:1px solid white;}
-  th { background:#4CAF50; }
-  select,input { margin:5px; padding:5px;}
+body {
+    font-family: Arial, sans-serif;
+    background: #1f2a38;
+    color: white;
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.controls {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+select, button {
+    padding: 8px;
+    margin: 5px;
+    border-radius: 6px;
+    border: none;
+    font-weight: bold;
+}
+
+button {
+    background: #4CAF50;
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255,255,255,0.05);
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background: #4CAF50;
+}
+
+tr:nth-child(even) {
+    background: rgba(255,255,255,0.05);
+}
+
+.summary {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 18px;
+}
 </style>
 </head>
+
 <body>
+
 <h1>Trainer Dashboard</h1>
 
-<label for="userFilter">User:</label>
-<select id="userFilter"><option value="">All</option></select>
+<div class="controls">
+    <select id="userFilter">
+        <option value="">All Users</option>
+    </select>
 
-<label for="machineFilter">Machine:</label>
-<select id="machineFilter"><option value="">All</option></select>
+    <select id="machineFilter">
+        <option value="">All Machines</option>
+    </select>
 
-<button onclick="applyFilters()">Apply Filters</button>
+    <button onclick="applyFilters()">Apply Filters</button>
+    <button onclick="resetFilters()">Reset</button>
+</div>
 
 <table>
-  <thead>
-    <tr>
-      <th>Date</th><th>User</th><th>Machine</th><th>Sets</th><th>Reps</th><th>Weight</th><th>1RM</th>
-    </tr>
-  </thead>
-  <tbody id="logBody"></tbody>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>User</th>
+            <th>Machine</th>
+            <th>Sets</th>
+            <th>Reps</th>
+            <th>Weight</th>
+            <th>1RM</th>
+            <th>Total Volume</th>
+        </tr>
+    </thead>
+    <tbody id="logBody">
+    </tbody>
 </table>
 
+<div class="summary" id="summaryBox">
+    Total Volume: 0 lbs
+</div>
+
 <script>
-// Google Sheets Web App URL
-const SHEET_URL = "<YOUR_WEB_APP_URL>"; // Same as workout page
-let logData = [];
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbyLuqCOn_pvN4Vg6ttQzq1jmZ58Kn79gau3rZ3DpDXD5vWpMO683VsYKMn7xfeleWhfoA/exec";
 
-// Fetch all workouts
-function fetchWorkouts(){
-  fetch(SHEET_URL) // Should be a GET endpoint returning JSON (we can adjust Apps Script)
-    .then(res=>res.json())
-    .then(data=>{
-      logData = data; 
-      populateFilters();
-      renderTable(logData);
-    })
-    .catch(err=>console.error(err));
+let fullData = [];
+let filteredData = [];
+
+// =============================
+// FETCH DATA
+// =============================
+function fetchWorkouts() {
+    fetch(SHEET_URL)
+        .then(res => res.json())
+        .then(data => {
+            fullData = data.reverse(); // newest first
+            filteredData = fullData;
+            populateFilters();
+            renderTable(filteredData);
+        })
+        .catch(err => {
+            console.error("Fetch error:", err);
+            alert("Error fetching workout data.");
+        });
 }
 
-// Populate filter dropdowns
-function populateFilters(){
-  const users = [...new Set(logData.map(e=>e.user))];
-  const machines = [...new Set(logData.map(e=>e.machine))];
-  const userFilter = document.getElementById("userFilter");
-  const machineFilter = document.getElementById("machineFilter");
-  users.forEach(u=>{
-    const opt = document.createElement("option"); opt.value=u; opt.textContent=u; userFilter.appendChild(opt);
-  });
-  machines.forEach(m=>{
-    const opt = document.createElement("option"); opt.value=m; opt.textContent=m; machineFilter.appendChild(opt);
-  });
+// =============================
+// POPULATE DROPDOWNS
+// =============================
+function populateFilters() {
+    const users = [...new Set(fullData.map(e => e.user))];
+    const machines = [...new Set(fullData.map(e => e.machine))];
+
+    const userFilter = document.getElementById("userFilter");
+    const machineFilter = document.getElementById("machineFilter");
+
+    userFilter.innerHTML = '<option value="">All Users</option>';
+    machineFilter.innerHTML = '<option value="">All Machines</option>';
+
+    users.forEach(user => {
+        userFilter.innerHTML += `<option value="${user}">${user}</option>`;
+    });
+
+    machines.forEach(machine => {
+        machineFilter.innerHTML += `<option value="${machine}">${machine}</option>`;
+    });
 }
 
-// Apply selected filters
-function applyFilters(){
-  const uVal = document.getElementById("userFilter").value;
-  const mVal = document.getElementById("machineFilter").value;
-  const filtered = logData.filter(item=> (uVal===""||item.user===uVal) && (mVal===""||item.machine===mVal));
-  renderTable(filtered);
+// =============================
+// APPLY FILTERS
+// =============================
+function applyFilters() {
+    const selectedUser = document.getElementById("userFilter").value;
+    const selectedMachine = document.getElementById("machineFilter").value;
+
+    filteredData = fullData.filter(entry =>
+        (selectedUser === "" || entry.user === selectedUser) &&
+        (selectedMachine === "" || entry.machine === selectedMachine)
+    );
+
+    renderTable(filteredData);
 }
 
-// Render table
-function renderTable(data){
-  const tbody = document.getElementById("logBody");
-  tbody.innerHTML="";
-  data.forEach(d=>{
-    const tr=document.createElement("tr");
-    tr.innerHTML=`<td>${d.date}</td><td>${d.user}</td><td>${d.machine}</td>
-      <td>${d.sets}</td><td>${d.reps}</td><td>${d.weight}</td><td>${d.oneRepMax}</td>`;
-    tbody.appendChild(tr);
-  });
+// =============================
+// RESET FILTERS
+// =============================
+function resetFilters() {
+    document.getElementById("userFilter").value = "";
+    document.getElementById("machineFilter").value = "";
+    filteredData = fullData;
+    renderTable(filteredData);
 }
 
-// Load on page open
+// =============================
+// RENDER TABLE
+// =============================
+function renderTable(data) {
+    const tbody = document.getElementById("logBody");
+    const summaryBox = document.getElementById("summaryBox");
+
+    tbody.innerHTML = "";
+    let totalVolume = 0;
+
+    data.forEach(entry => {
+        const volume = entry.sets * entry.reps * entry.weight;
+        totalVolume += volume;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${new Date(entry.date).toLocaleString()}</td>
+            <td>${entry.user}</td>
+            <td>${entry.machine}</td>
+            <td>${entry.sets}</td>
+            <td>${entry.reps}</td>
+            <td>${entry.weight}</td>
+            <td>${entry.oneRepMax}</td>
+            <td>${volume}</td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    summaryBox.textContent = "Total Volume: " + totalVolume + " lbs";
+}
+
+// =============================
+// INIT
+// =============================
 fetchWorkouts();
 </script>
+
 </body>
 </html>
