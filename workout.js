@@ -1,46 +1,65 @@
-// Display the username and selected exercise
+// Load user and machine
 window.onload = function() {
-    let userName = localStorage.getItem("userName");
-    let selectedMachine = localStorage.getItem("selectedMachine");
-    document.getElementById("user_id").textContent = userName || "Guest";
-    document.getElementById("machine_name").textContent = selectedMachine || "No Machine Selected";
+    const userName = localStorage.getItem("userName") || "Guest";
+    const selectedMachine = localStorage.getItem("selectedMachine") || "No Machine Selected";
+    document.getElementById("user_id").textContent = userName;
+    document.getElementById("machine_name").textContent = selectedMachine;
+
+    renderWorkoutLog();
 };
 
-// Save Workout Function
+// Save workouts persistently
 function saveWorkout() {
-    let sets = parseInt(document.getElementById("sets").value);
-    let reps = parseInt(document.getElementById("reps").value);
-    let weight = parseFloat(document.getElementById("weight").value);
-    let user = localStorage.getItem("userName");
-    let exercise = localStorage.getItem("selectedMachine");
-    let date = new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    const sets = parseInt(document.getElementById("sets").value);
+    const reps = parseInt(document.getElementById("reps").value);
+    const weight = parseFloat(document.getElementById("weight").value);
+    const user = localStorage.getItem("userName");
+    const exercise = localStorage.getItem("selectedMachine");
+    const date = new Date().toLocaleDateString("en-US", {month:"short",day:"numeric",year:"numeric"});
 
-    if (sets <= 0 || reps <= 0 || weight <= 0) {
-        alert("Please enter valid workout details.");
+    // Input validation
+    if(!sets || !reps || !weight || sets<=0 || reps<=0 || weight<=0 || reps>100 || sets>50 || weight>2000){
+        alert("Please enter realistic workout details.");
         return;
     }
 
-    let oneRepMax = Math.round(weight * (1 + reps / 30));
+    const oneRepMax = Math.round(weight*(1+reps/30));
 
-    // Create a new workout log item
-    let logItem = document.createElement("li");
-    logItem.innerHTML = `<strong>${exercise}</strong> - ${sets}x${reps} @ ${weight} lbs 
-        <br> 1-Rep Max: <strong>${oneRepMax} lbs</strong> 
-        <br> <em>${date}</em>`;
+    const newWorkout = {exercise, sets, reps, weight, oneRepMax, date};
 
-    // Prepend the log item to the workout list
-    document.getElementById("workout_list").prepend(logItem);
+    // Save persistently in localStorage per user
+    const stored = JSON.parse(localStorage.getItem("workouts")||"{}");
+    stored[user] = stored[user] || [];
+    stored[user].unshift(newWorkout); // prepend
+    localStorage.setItem("workouts", JSON.stringify(stored));
 
-    // Clear input fields
-    document.getElementById("sets").value = "";
-    document.getElementById("reps").value = "";
-    document.getElementById("weight").value = "";
+    // Clear inputs
+    document.getElementById("sets").value="";
+    document.getElementById("reps").value="";
+    document.getElementById("weight").value="";
 
-    alert("Workout saved successfully!");
+    renderWorkoutLog();
 }
 
-// Logout Function
-function logout() {
+// Render workout log from localStorage
+function renderWorkoutLog(){
+    const user = localStorage.getItem("userName");
+    const list = document.getElementById("workout_list");
+    list.innerHTML = "";
+    const stored = JSON.parse(localStorage.getItem("workouts")||"{}");
+    if(stored[user]){
+        stored[user].forEach(w=>{
+            const li = document.createElement("li");
+            li.innerHTML=`<strong>${w.exercise}</strong> - ${w.sets}x${w.reps} @ ${w.weight} lbs
+                <br>1-Rep Max: <strong>${w.oneRepMax} lbs</strong><br><em>${w.date}</em>`;
+            list.appendChild(li);
+        });
+    }
+}
+
+// Logout
+function logout(){
+    localStorage.removeItem("userCode");
     localStorage.removeItem("userName");
-    window.location.href = "index.html";  // Redirect to login page
+    window.location.href="index.html";
 }
