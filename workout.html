@@ -3,46 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Workout Tracker</title>
+<title>Workout Entry</title>
 <link rel="stylesheet" href="styles.css">
-<style>
-  body { font-family: Arial, sans-serif; text-align: center; background: #2c3e50; color: white; margin:0; padding:0;}
-  #workout_screen { max-width: 700px; margin: 20px auto; padding: 20px; background: rgba(0,0,0,0.5); border-radius: 15px;}
-  input { padding:10px; margin:5px; width: 80px; border-radius:5px; border:none; text-align:center;}
-  button { padding:10px 20px; margin:10px; border:none; border-radius:5px; cursor:pointer; background:#4CAF50; color:white; font-weight:bold;}
-  #workout_list li { text-align:left; margin-bottom:10px; background: rgba(255,255,255,0.1); padding:8px; border-radius:5px;}
-  #next_plan { margin-top:20px; padding:15px; background: rgba(255,255,255,0.15); border-radius:10px;}
-  #exercise_demo { margin:15px 0; max-width:300px; border-radius:10px; }
-</style>
 </head>
 <body>
+<div class="container">
+    <h1 id="welcome"></h1>
+    <h2 id="machine-name"></h2>
 
-<div id="workout_screen">
-  <h1>Welcome, <span id="user_id"></span>!</h1>
-  <h2>Machine: <span id="machine_name"></span></h2>
-
-  <img id="exercise_demo" src="default.gif" alt="Exercise Demo">
-
-  <div>
-    <label for="sets">Sets:</label>
+    <label>Sets:</label>
     <input type="number" id="sets" min="1">
-    <label for="reps">Reps:</label>
+
+    <label>Reps:</label>
     <input type="number" id="reps" min="1">
-    <label for="weight">Weight (lbs):</label>
+
+    <label>Weight (lbs):</label>
     <input type="number" id="weight" min="1">
-  </div>
 
-  <button onclick="saveWorkout()">Save Workout</button>
-
-  <div id="next_plan">
-    <h3>Next Session Suggestion</h3>
-    <p id="plan_text">Log a workout to see suggestions!</p>
-  </div>
-
-  <h2>Workout Log</h2>
-  <ul id="workout_list"></ul>
-
-  <button onclick="logout()">Log Out</button>
+    <button onclick="saveWorkout()">Save Workout</button>
+    <button onclick="logout()" class="secondary">Log Out</button>
 </div>
 
 <script src="workout.js"></script>
