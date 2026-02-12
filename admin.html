@@ -1,80 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Select Machine</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
-
-        .machine-button {
-            font-size: 1.2rem;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            margin: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .machine-button:hover {
-            background-color: #45a049;
-        }
-
-        .status {
-            margin-top: 20px;
-            font-size: 1rem;
-            font-weight: bold;
-        }
-
-        .status.success {
-            color: green;
-        }
-
-        .status.error {
-            color: red;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Select Machine</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+    }
+    h1 { font-size: 2rem; margin-bottom: 20px; }
+    .machine-button {
+        font-size: 1.2rem;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        padding: 15px 25px;
+        margin: 10px;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+    .machine-button:hover { background-color: #45a049; }
+    .status {
+        margin-top: 20px;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+    .status.success { color: green; }
+    .status.error { color: red; }
+</style>
 </head>
 <body>
 
-    <h1>Select a Machine</h1>
+<h1>Select a Machine</h1>
+<div id="machine_buttons"></div>
+<p id="status" class="status"></p>
 
-    <button class="machine-button" onclick="selectMachine('Leg Press')">Leg Press</button>
-    <button class="machine-button" onclick="selectMachine('Bench Press')">Bench Press</button>
-    <button class="machine-button" onclick="selectMachine('Lat Pulldown')">Lat Pulldown</button>
+<script>
+const machines = ["Leg Press", "Bench Press", "Lat Pulldown"];
+const buttonsContainer = document.getElementById("machine_buttons");
+const status = document.getElementById("status");
 
-    <p id="status" class="status"></p>
+// Dynamically generate buttons
+machines.forEach(machine => {
+    const btn = document.createElement("button");
+    btn.textContent = machine;
+    btn.className = "machine-button";
+    btn.onclick = () => selectMachine(machine);
+    btn.setAttribute("aria-label", machine);
+    buttonsContainer.appendChild(btn);
+});
 
-    <script>
-        function selectMachine(machineName) {
-            // Save the selected machine in localStorage
-            localStorage.setItem("selectedMachine", machineName);
+function selectMachine(machineName) {
+    try {
+        localStorage.setItem("selectedMachine", machineName);
+        status.textContent = `Machine selected: ${machineName}`;
+        status.className = "status success";
 
-            // Update the status to confirm the selection
-            document.getElementById('status').textContent = `Machine selected: ${machineName}`;
-            document.getElementById('status').className = 'status success';
+        setTimeout(() => { window.location.href = "index.html"; }, 1000);
+    } catch(e) {
+        status.textContent = "Failed to select machine.";
+        status.className = "status error";
+    }
+}
+</script>
 
-            // Redirect to login page after selection
-            setTimeout(() => {
-                window.location.href = "index.html"; // Redirect to the login page
-            }, 1500); // Wait 1.5 seconds before redirecting
-        }
-    </script>
 </body>
 </html>
